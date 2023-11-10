@@ -1,5 +1,5 @@
 {
-    "name": "web-client",
+    "name": "podchy-web",
     "private": true,
     "version": "0.0.0",
     "type": "module",
@@ -11,12 +11,17 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@ant-design/icons": "^5.2.6",
+        "@monaco-editor/react": "^4.6.0",
         "antd": "^5.11.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "react-router-dom": "^6.18.0"
+        "react-icons": "^4.11.0",
+        "react-router-dom": "^6.18.0",
+        "vite-plugin-svgr": "^4.1.0"
     },
     "devDependencies": {
+        "@types/node": "^20.8.10",
         "@types/react": "^18.2.15",
         "@types/react-dom": "^18.2.7",
         "@typescript-eslint/eslint-plugin": "^6.0.0",

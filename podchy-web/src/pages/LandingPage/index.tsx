@@ -1,27 +1,18 @@
-import { Button, Flex } from 'antd';
+import { Button } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import LandingLayout from '@layouts/LandingLayout';
 
 function LandingPage() {
+    const navigate = useNavigate();
+
     return (
-        <Flex vertical className="h-screen">
-            <header className="flex flex-row p-2 justify-between items-center gap-2">
-                <div>
-                    <p className="text-3xl my-0 font-bold">Pody</p>
-                </div>
-                <div className="flex flex-row gap-2">
-                    <Button type="primary" shape="round" size="large">
-                        Login
-                    </Button>
-                    <Button shape="round" size="large">
-                        Sign Up
-                    </Button>
-                </div>
-            </header>
+        <LandingLayout>
             <main className="h-full flex flex-col items-center justify-center">
                 <div className="container flex flex-col items-center">
                     <p className="text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-lavender to-rose-300 m-0">
                         Unleash Your Code.
                     </p>
-                    <p className="text-7xl font-medium text- m-0">
+                    <p className="text-6xl font-semibold text- m-0">
                         Create, Collaborate, Innovate!
                     </p>
                     <p className="text-3xl text-gray-500 text-center">
@@ -37,6 +28,10 @@ function LandingPage() {
                             style={{
                                 paddingRight: '4rem',
                                 paddingLeft: '4rem',
+                                fontWeight: 'bold',
+                            }}
+                            onClick={() => {
+                                navigate('/signup');
                             }}
                         >
                             Get a demo
@@ -47,6 +42,10 @@ function LandingPage() {
                             style={{
                                 paddingRight: '4rem',
                                 paddingLeft: '4rem',
+                                fontWeight: 'bold',
+                            }}
+                            onClick={() => {
+                                navigate('/signup');
                             }}
                         >
                             Try for free
@@ -54,7 +53,7 @@ function LandingPage() {
                     </div>
                 </div>
             </main>
-        </Flex>
+        </LandingLayout>
     );
 }
 
