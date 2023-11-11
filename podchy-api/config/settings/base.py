@@ -41,6 +41,8 @@ DEFAULT_APPS = [
 
 THIRD_PARTY_APPS = [
     "rest_framework",
+    "rest_framework.authtoken",
+    "corsheaders",
 ]
 
 PROJECT_APPS = [
@@ -53,6 +55,7 @@ INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -95,6 +98,12 @@ DATABASES = {
     }
 }
 
+
+# REST Framework cors headers
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3002",
+    "http://192.168.0.8:3002",
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

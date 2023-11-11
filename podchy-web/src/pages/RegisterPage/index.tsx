@@ -1,17 +1,44 @@
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, notification } from 'antd';
 import LandingLayout from '@layouts/LandingLayout';
 import SignUpImage from '@assets/images/signup-undraw.svg?react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 type FieldType = {
     username: string;
     email: string;
+    first_name: string;
+    last_name: string;
     password: string;
-    repeatPassword: string;
+    password_again: string;
 };
 
 const RegisterPage = () => {
+    const navigate = useNavigate();
     const handleSubmit = (values: FieldType) => {
         console.log(values);
+        axios
+            .post(
+                `${import.meta.env.VITE_PODCHY_API_URL}/api/auth/register`,
+                values,
+            )
+            .then((res) => {
+                const { username } = res.data;
+                notification.success({
+                    placement: 'topRight',
+                    message: 'Register success',
+                    description: `Please login to continue as ${username}`,
+                });
+                navigate('/login');
+            })
+            .catch((err) => {
+                console.error(err);
+                notification.error({
+                    placement: 'topRight',
+                    message: 'Register failed',
+                    description: 'Some error occured. Please try again.',
+                });
+            });
     };
     return (
         <LandingLayout>
@@ -34,6 +61,31 @@ const RegisterPage = () => {
                             wrapperCol={{ span: 16 }}
                             onFinish={handleSubmit}
                         >
+                            <Form.Item<FieldType>
+                                label="First name"
+                                name="first_name"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:
+                                            'Please input your first name!',
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
+                            <Form.Item<FieldType>
+                                label="Last Name"
+                                name="last_name"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Please input your last name!',
+                                    },
+                                ]}
+                            >
+                                <Input />
+                            </Form.Item>
                             <Form.Item<FieldType>
                                 label="Username"
                                 name="username"
@@ -72,7 +124,7 @@ const RegisterPage = () => {
                             </Form.Item>
                             <Form.Item<FieldType>
                                 label="Password again"
-                                name="repeatPassword"
+                                name="password_again"
                                 rules={[
                                     {
                                         required: true,

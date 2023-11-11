@@ -38,7 +38,7 @@ export default function FileTreeEntity({
     return (
         <button
             className={`border-none bg-transparent flex items-center justify-between ${
-                isActive ? 'bg-[#f0f1f2]' : ''
+                isActive ? 'bg-[#f5f5f5]' : ''
             } p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender`}
             onClick={handleSelectItem}
         >

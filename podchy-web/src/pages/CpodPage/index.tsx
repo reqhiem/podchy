@@ -13,10 +13,11 @@ import {
 import type { MenuProps, CollapseProps } from 'antd';
 import { BiSolidShareAlt } from 'react-icons/bi';
 import { FaPlay } from 'react-icons/fa';
-import './styles.css';
 import { Editor } from '@monaco-editor/react';
 import { editor } from 'monaco-editor';
 import FileTreeEntity from '@components/FileTreeEntity';
+import { AiOutlineClose } from 'react-icons/ai';
+import './styles.css';
 
 export default function CpodPage() {
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -53,7 +54,8 @@ export default function CpodPage() {
             children: (
                 <div className="flex flex-col gap-1">
                     <FileTreeEntity type="python" name="main.py" active />
-                    <FileTreeEntity type="python" name="main.py" />
+                    <FileTreeEntity type="python" name="program.py" />
+                    <FileTreeEntity type="python" name="fibo.py" />
                 </div>
             ),
         },
@@ -67,7 +69,9 @@ export default function CpodPage() {
         <Flex vertical className="h-screen">
             <header className="flex justify-between items-center border-0 border-b-2 border-solid border-gray-300 px-4">
                 <div className="flex items-center gap-2">
-                    <p className="font-bold text-xl text-lavender m-2">Podchy.</p>
+                    <p className="font-bold text-xl text-lavender m-2">
+                        Podchy.
+                    </p>
                     <Button className="flex items-center rounded-lg font-semibold">
                         workcito
                     </Button>
@@ -111,7 +115,62 @@ export default function CpodPage() {
                     </div>
                 </Col>
                 <Col span={14} className="h-full rounded-lg ">
-                    <div className="py-2">Tab pane</div>
+                    <div className="flex bg-[#f5f5f5] mt-1 rounded-t-md border-b-4 border-teal-400">
+                        <div className="bg-white flex items-center tab-item active-tab-item cursor-pointer">
+                            <button
+                                className="m-0 p-2 bg-transparent border-0 cursor-pointer"
+                                onClick={() => {
+                                    console.log('click');
+                                }}
+                            >
+                                main.py
+                            </button>
+                            <div className="h-full flex items-center px-1">
+                                <Button
+                                    size="small"
+                                    type="text"
+                                    className="flex flex-row items-center justify-center"
+                                    icon={<AiOutlineClose />}
+                                />
+                            </div>
+                        </div>
+                        <div className="bg-white flex items-center">
+                            <button
+                                className="m-0 p-2 bg-transparent border-0 cursor-pointer"
+                                onClick={() => {
+                                    console.log('click');
+                                }}
+                            >
+                                program.py
+                            </button>
+                            <div className="h-full flex items-center px-1 tab-item">
+                                <Button
+                                    size="small"
+                                    type="text"
+                                    className="flex flex-row items-center justify-center"
+                                    icon={<AiOutlineClose />}
+                                />
+                            </div>
+                        </div>
+                        <div className="bg-white flex items-center tab-item">
+                            <button
+                                className="m-0 p-2 bg-transparent border-0 cursor-pointer"
+                                onClick={() => {
+                                    console.log('click');
+                                }}
+                            >
+                                fibo.py
+                            </button>
+                            <div className="h-full flex items-center px-1">
+                                <Button
+                                    size="small"
+                                    type="text"
+                                    className="flex flex-row items-center justify-center"
+                                    icon={<AiOutlineClose />}
+                                />
+                            </div>
+                        </div>
+                    </div>
                     <div className="h-full bg-white px-2 font-mono">
                         <p className="text-xs text-gray-400 m-0">main.py</p>
                         <Editor
@@ -128,11 +187,30 @@ export default function CpodPage() {
                     </div>
                 </Col>
                 <Col span={6} className="h-full rounded-lg px-1">
-                    <div className="py-2">Console</div>
+                    <div className="flex bg-[#f5f5f5] mt-1 rounded-t-md border-b-4 border-teal-400">
+                        <div className="bg-white flex items-center tab-item active-tab-item cursor-pointer">
+                            <button
+                                className="m-0 p-2 bg-transparent border-0 cursor-pointer"
+                                onClick={() => {
+                                    console.log('click');
+                                }}
+                            >
+                                console
+                            </button>
+                            <div className="h-full flex items-center px-1">
+                                <Button
+                                    size="small"
+                                    type="text"
+                                    className="flex flex-row items-center justify-center"
+                                    icon={<AiOutlineClose />}
+                                />
+                            </div>
+                        </div>
+                    </div>
                     <div className="h-full bg-white p-2">
                         <p className="leading-8 inline-flex">
                             Results of{' '}
-                            <span className='mx-2'>
+                            <span className="mx-2">
                                 <Button
                                     type="primary"
                                     className="flex items-center bg-green-500 text-white font-semibold run-button"

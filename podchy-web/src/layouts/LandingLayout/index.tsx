@@ -1,6 +1,6 @@
 import { GithubOutlined } from '@ant-design/icons';
 import { Button, Flex } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 type LandingLayoutProps = {
     children: React.ReactNode;
@@ -11,9 +11,11 @@ const LandingLayout = ({ children }: LandingLayoutProps) => {
     return (
         <Flex vertical className="h-screen">
             <header className="flex flex-row p-2 justify-between items-center gap-2">
-                <div>
-                    <p className="text-3xl my-0 font-bold">Podchy.</p>
-                </div>
+                <Link to={'/'}>
+                    <p className="text-3xl my-0 font-bold text-lavender">
+                        Podchy.
+                    </p>
+                </Link>
                 <div className="flex flex-row gap-2">
                     <div className="flex items-center text-xl">
                         <GithubOutlined />

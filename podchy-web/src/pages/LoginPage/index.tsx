@@ -1,6 +1,8 @@
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, notification } from 'antd';
 import LandingLayout from '@layouts/LandingLayout';
 import SignUpImage from '@assets/images/signup-undraw.svg?react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 type FieldType = {
     username: string;
@@ -8,8 +10,39 @@ type FieldType = {
 };
 
 const LoginPage = () => {
+    const navigate = useNavigate();
+
+    const openNotification = (message: string) => {
+        notification.error({
+            placement: 'topRight',
+            message: 'Login failed',
+            description: message,
+        });
+    };
+
     const handleSubmit = (values: FieldType) => {
-        console.log(values);
+        axios
+            .post(
+                `${import.meta.env.VITE_PODCHY_API_URL}/api/auth/login`,
+                values,
+            )
+            .then((res) => {
+                console.log(res.data);
+                const { key, user } = res.data;
+
+                localStorage.setItem('token', key);
+                localStorage.setItem('username', user.username);
+                localStorage.setItem('email', user.email);
+                localStorage.setItem(
+                    'fullName',
+                    `${user.first_name} ${user.last_name}`,
+                );
+                navigate('/~');
+            })
+            .catch((err) => {
+                console.error(err);
+                openNotification(err.response.data.non_field_errors[0]);
+            });
     };
     return (
         <LandingLayout>
@@ -58,7 +91,7 @@ const LoginPage = () => {
                             </Form.Item>
                             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                                 <Button type="primary" htmlType="submit">
-                                    Submit
+                                    Log In
                                 </Button>
                             </Form.Item>
                         </Form>
