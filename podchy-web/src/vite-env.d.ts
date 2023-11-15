@@ -4,6 +4,7 @@
 
 interface ImportMetaEnv { 
     readonly VITE_PODCHY_API_URL: string;
+    readonly VITE_PODCHY_WS_URL: string;
 }
 
 interface ImportMeta {

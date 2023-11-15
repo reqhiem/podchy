@@ -3,10 +3,12 @@ import {
     Button,
     Dropdown,
     Flex,
+    Form,
     Input,
     List,
     Modal,
     Select,
+    notification,
 } from 'antd';
 import type { MenuProps } from 'antd';
 import { LogoutOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons';
@@ -17,21 +19,43 @@ import {
     BiLogoJavascript,
     BiLogoPython,
 } from 'react-icons/bi';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Spinner from '@components/Spinner';
 import './styles.css';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
-type DataType = {
-    title: string;
-    owner: string;
-    picture: string;
-    loading: boolean;
+enum Permission {
+    OWNER = 'OWNER',
+    INVITED = 'INVITED',
+}
+
+type UserDetail = {
+    username: string;
+    email: string;
+};
+
+type UserPermission = {
+    user: UserDetail;
+    permission: Permission;
+};
+
+type Cpod = {
+    cid: string;
+    name: string;
+    language: string;
+    users: UserPermission[];
+};
+
+type NewCpodForm = {
+    name: string;
+    language: string;
 };
 
 export default function HomePage() {
-    const [loaded] = useState(true);
+    const [loaded, setLoaded] = useState(false);
     const [openModal, setOpenModal] = useState(false);
+    const [cpods, setCpods] = useState<Cpod[]>([]);
     const authContextValues = useMemo(
         () => ({
             username: localStorage.getItem('username'),
@@ -41,6 +65,20 @@ export default function HomePage() {
         }),
         [],
     );
+
+    useEffect(() => {
+        axios
+            .get(`${import.meta.env.VITE_PODCHY_API_URL}/api/cpod`, {
+                headers: {
+                    Authorization: `Token ${authContextValues.token}`,
+                },
+            })
+            .then((res) => {
+                setCpods(res.data);
+                setLoaded(true);
+            });
+    }, [authContextValues.token]);
+
     const items: MenuProps['items'] = [
         {
             key: '1',
@@ -71,24 +109,9 @@ export default function HomePage() {
         },
     ];
 
-    const data: DataType[] = [
+    const optionsItems: MenuProps['items'] = [
         {
-            title: 'workcito',
-            owner: '@reqhiem',
-            picture: 'https://xsgames.co/randomusers/avatar.php?g=pixel',
-            loading: false,
-        },
-        {
-            title: 'python',
-            owner: '@reqhiem',
-            picture: 'https://xsgames.co/randomusers/avatar.php?g=pixel',
-            loading: false,
-        },
-    ];
-
-    const _items: MenuProps['items'] = [
-        {
-            key: '1',
+            key: 'edit',
             label: (
                 <>
                     <div className="flex flex-row gap-4 items-center pr-10">
@@ -99,7 +122,7 @@ export default function HomePage() {
             ),
         },
         {
-            key: '2',
+            key: 'share',
             label: (
                 <>
                     <div className="flex flex-row gap-4 items-center pr-10">
@@ -110,7 +133,7 @@ export default function HomePage() {
             ),
         },
         {
-            key: '3',
+            key: 'delete',
             label: (
                 <>
                     <div className="flex flex-row gap-4 items-center pr-10 text-red-500">
@@ -121,6 +144,60 @@ export default function HomePage() {
             ),
         },
     ];
+
+    const handleDeleteCpod = (cid: string) => {
+        axios
+            .delete(`${import.meta.env.VITE_PODCHY_API_URL}/api/cpod/${cid}`, {
+                headers: {
+                    Authorization: `Token ${authContextValues.token}`,
+                },
+            })
+            .then((res) => {
+                if (res.status === 204) {
+                    setCpods(cpods.filter((cpod) => cpod.cid !== cid));
+                    notification.success({
+                        placement: 'topRight',
+                        message: 'Delete Cpod success',
+                        description: 'Cpod successfully deleted',
+                    });
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+                notification.error({
+                    placement: 'topRight',
+                    message: 'Delete Cpod failed',
+                    description: 'Some error occured, please try again later',
+                });
+            });
+    };
+
+    const handleOnClickOption = (option: string, cid: string) => {
+        if (option === 'delete') {
+            handleDeleteCpod(cid);
+        }
+    };
+
+    const handleCreateCpod = (values: NewCpodForm) => {
+        axios
+            .post(`${import.meta.env.VITE_PODCHY_API_URL}/api/cpod`, values, {
+                headers: {
+                    Authorization: `Token ${authContextValues.token}`,
+                },
+            })
+            .then((res) => {
+                setCpods([res.data, ...cpods]);
+                setOpenModal(false);
+            })
+            .catch((err) => {
+                console.error(err);
+                notification.error({
+                    placement: 'topRight',
+                    message: 'Create Cpod failed',
+                    description: 'Some error occured, please try again later',
+                });
+            });
+    };
 
     return (
         <Flex vertical>
@@ -133,42 +210,66 @@ export default function HomePage() {
                         footer={null}
                         onCancel={() => setOpenModal(false)}
                     >
-                        <p className="text-xl m-0 font-semibold">
-                            Create a new Cpod
-                        </p>
-                        <div className="my-3 flex flex-col gap-2">
-                            <p className="m-0">Title</p>
-                            <Input placeholder="Cpod name" required />
-                        </div>
-                        <div className="my-3 flex flex-col gap-2">
-                            <p className="m-0">Language</p>
-                            <Select
-                                defaultValue="python"
-                                options={[
+                        <Form layout="vertical" onFinish={handleCreateCpod}>
+                            <p className="text-xl m-0 font-semibold mb-3">
+                                Create a new Cpod
+                            </p>
+                            <Form.Item<NewCpodForm>
+                                name="name"
+                                label="Title"
+                                rules={[
                                     {
-                                        label: (
-                                            <div className="flex gap-2 items-center">
-                                                <BiLogoPython />
-                                                Python
-                                            </div>
-                                        ),
-                                        value: 'python',
-                                    },
-                                    {
-                                        label: (
-                                            <div className="flex gap-2 items-center">
-                                                <BiLogoJavascript />
-                                                JavaScript
-                                            </div>
-                                        ),
-                                        value: 'javascript',
+                                        required: true,
+                                        message: 'Please fill the name of Cpod',
                                     },
                                 ]}
-                            />
-                        </div>
-                        <Button block type="primary" className="mt-2">
-                            Create
-                        </Button>
+                            >
+                                <Input placeholder="Cpod name" />
+                            </Form.Item>
+                            <Form.Item<NewCpodForm>
+                                name="language"
+                                label="Primary language"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:
+                                            'Please fill the primary language',
+                                    },
+                                ]}
+                            >
+                                <Select
+                                    placeholder="Select a language"
+                                    options={[
+                                        {
+                                            label: (
+                                                <div className="flex gap-2 items-center">
+                                                    <BiLogoPython />
+                                                    Python
+                                                </div>
+                                            ),
+                                            value: 'python',
+                                        },
+                                        {
+                                            label: (
+                                                <div className="flex gap-2 items-center">
+                                                    <BiLogoJavascript />
+                                                    JavaScript
+                                                </div>
+                                            ),
+                                            value: 'javascript',
+                                        },
+                                    ]}
+                                />
+                            </Form.Item>
+                            <Button
+                                block
+                                type="primary"
+                                htmlType="submit"
+                                className="mt-2"
+                            >
+                                Create
+                            </Button>
+                        </Form>
                     </Modal>
                     <Button
                         icon={<PlusOutlined />}
@@ -204,14 +305,24 @@ export default function HomePage() {
                             <div className="">
                                 <List
                                     itemLayout="horizontal"
-                                    dataSource={data}
+                                    dataSource={cpods}
                                     renderItem={(item) => (
                                         <List.Item
                                             actions={[
                                                 <>
                                                     <Dropdown
                                                         placement="bottomRight"
-                                                        menu={{ items: _items }}
+                                                        menu={{
+                                                            items: optionsItems,
+                                                            onClick: ({
+                                                                key,
+                                                            }) => {
+                                                                handleOnClickOption(
+                                                                    key,
+                                                                    item.cid,
+                                                                );
+                                                            },
+                                                        }}
                                                         trigger={['click']}
                                                     >
                                                         <Button
@@ -225,18 +336,16 @@ export default function HomePage() {
                                         >
                                             <List.Item.Meta
                                                 avatar={
-                                                    <Avatar
-                                                        src={item.picture}
-                                                    />
+                                                    <Avatar src="https://xsgames.co/randomusers/avatar.php?g=pixel" />
                                                 }
                                                 title={
                                                     <Link
-                                                        to={`/@${authContextValues.username}/${item.title}`}
+                                                        to={`/@${authContextValues.username}/${item.cid}`}
                                                     >
-                                                        {item.title}
+                                                        {item.name}
                                                     </Link>
                                                 }
-                                                description="@reqhiem"
+                                                description={`@${item.users[0].user.username}`}
                                             />
                                         </List.Item>
                                     )}

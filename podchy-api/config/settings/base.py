@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ["localhost", "192.168.0.8"]
 # Application definition
 
 DEFAULT_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -81,8 +82,16 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "config.wsgi.application"
+# WSGI_APPLICATION = "config.wsgi.application"
 
+# For channel support
+ASGI_APPLICATION = "config.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

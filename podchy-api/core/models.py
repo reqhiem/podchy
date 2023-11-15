@@ -11,10 +11,19 @@ class Cpod(models.Model):
         help_text="Unique identifier for the cpod",
     )
     name = models.CharField(max_length=100)
+    language = models.CharField(
+        max_length=50,
+        default="python",
+        help_text="Main programming language of the cpod",
+    )
     users = models.ManyToManyField(
         User,
         through="Permission",
         help_text="Users that have access to the cpod",
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text="Date of creation.",
     )
 
     class Meta:
@@ -61,9 +70,21 @@ class FileCode(models.Model):
         editable=False,
         help_text="Unique identifier for the file",
     )
-    filename = models.CharField(max_length=100)
-    language = models.CharField(max_length=100)
-    value = models.TextField()
+    filename = models.CharField(
+        max_length=100,
+        default="main.py",
+        help_text="Name of the file",
+    )
+    language = models.CharField(
+        max_length=100,
+        default="python",
+        help_text="Programming language of the file",
+    )
+    value = models.TextField(
+        default="",
+        blank=True,
+        help_text="Content of the file",
+    )
     cpod = models.ForeignKey(
         Cpod,
         on_delete=models.CASCADE,

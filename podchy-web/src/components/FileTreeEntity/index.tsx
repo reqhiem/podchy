@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import { BiLogoPython } from 'react-icons/bi';
@@ -6,19 +5,22 @@ import { SlOptionsVertical } from 'react-icons/sl';
 import { AiFillDelete } from 'react-icons/ai';
 
 type FileTreeEntityProps = {
+    id: string;
     type: string;
     name: string;
     active?: boolean;
+    onSelectItem: (key: string) => void;
 };
 
 export default function FileTreeEntity({
+    id,
     type,
     name,
     active,
+    onSelectItem,
 }: FileTreeEntityProps) {
-    const [isActive, setIsActive] = useState<boolean>(active || false);
     const handleSelectItem = () => {
-        setIsActive((prev) => !prev);
+        onSelectItem(id);
     };
 
     const items: MenuProps['items'] = [
@@ -38,7 +40,7 @@ export default function FileTreeEntity({
     return (
         <button
             className={`border-none bg-transparent flex items-center justify-between ${
-                isActive ? 'bg-[#f5f5f5]' : ''
+                active ? 'bg-[#f7f7f7]' : ''
             } p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender`}
             onClick={handleSelectItem}
         >
