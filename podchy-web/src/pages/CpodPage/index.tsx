@@ -42,6 +42,12 @@ const LANGUAGES: Record<string, string> = {
     js: 'javascript',
 };
 
+const COMPILERS: Record<string, string> = {
+    python: 'python3',
+    javascript: 'node',
+    cpp: 'g++',
+};
+
 const getLanguage = (filename: string) => {
     const parts = filename.split('.');
     const extension = parts.length > 1 ? (parts.pop() as string) : '';
@@ -58,6 +64,8 @@ export default function CpodPage() {
     const [currentFile, setCurrentFile] = useState<IFile | undefined>(
         undefined,
     );
+
+    const [result, setResult] = useState<string | undefined>(undefined);
 
     const authContextValues = useMemo(
         () => ({
@@ -157,10 +165,12 @@ export default function CpodPage() {
             key: '2',
             label: (
                 <>
-                    <div className="flex flex-row gap-3">
-                        <LogoutOutlined />
-                        Logout
-                    </div>
+                    <Link to="/logout">
+                        <div className="flex flex-row gap-3">
+                            <LogoutOutlined />
+                            Logout
+                        </div>
+                    </Link>
                 </>
             ),
         },
@@ -182,11 +192,16 @@ export default function CpodPage() {
     };
 
     const handleRunCode = () => {
-        const editor = editorRef.current;
-        if (editor) {
-            const code = editor.getValue();
-            console.log(code);
-        }
+        const requestPayload = {
+            filename: currentFile?.filename,
+            content: currentFile?.content,
+        };
+
+        podchyClient.post(`/cpod/${cpod}/run`, requestPayload).then((res) => {
+            if (res.status === 200) {
+                setResult(res.data.result);
+            }
+        });
     };
 
     const collapseItems: CollapseProps['items'] = [
@@ -420,11 +435,9 @@ export default function CpodPage() {
                             <div className="bg-white flex items-center tab-item active-tab-item cursor-pointer">
                                 <button
                                     className="m-0 p-2 bg-transparent border-0 cursor-pointer"
-                                    onClick={() => {
-                                        console.log('click');
-                                    }}
+                                    onClick={() => {}}
                                 >
-                                    console
+                                    Console
                                 </button>
                                 <div className="h-full flex items-center px-1">
                                     <Button
@@ -437,20 +450,36 @@ export default function CpodPage() {
                             </div>
                         </div>
                         <div className="h-full bg-white p-2">
-                            <p className="leading-8 inline-flex">
-                                Results of{' '}
-                                <span className="mx-2">
-                                    <Button
-                                        type="primary"
-                                        className="flex items-center bg-green-500 text-white font-semibold run-button"
-                                        icon={<FaPlay />}
-                                        onClick={handleRunCode}
-                                    >
-                                        Run
-                                    </Button>
-                                </span>{' '}
-                                the code.
-                            </p>
+                            {result ? (
+                                <div className="w-full">
+                                    <p className="font-mono font-bold">
+                                        {`> ${
+                                            COMPILERS[
+                                                currentFile?.language ||
+                                                    'python'
+                                            ]
+                                        } ${currentFile?.filename}`}
+                                    </p>
+                                    <p className="font-mono whitespace-pre-wrap">
+                                        {result}
+                                    </p>
+                                </div>
+                            ) : (
+                                <p className="leading-8 inline-flex">
+                                    Results of{' '}
+                                    <span className="mx-2">
+                                        <Button
+                                            type="primary"
+                                            className="flex items-center bg-green-500 text-white font-semibold run-button"
+                                            icon={<FaPlay />}
+                                            onClick={handleRunCode}
+                                        >
+                                            Run
+                                        </Button>
+                                    </span>{' '}
+                                    the code.
+                                </p>
+                            )}
                         </div>
                     </Col>
                 </Row>
