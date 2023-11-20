@@ -1,6 +1,12 @@
-.phony: resources
-resources:
+.phony: start
+start:
 	- docker compose -f docker-compose.yml up -d
+	- minikube start
+
+.phony: stop
+stop:
+	- minikube stop
+	- docker compose -f docker-compose.yml stop
 
 .phony: run
 run:

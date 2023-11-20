@@ -30,4 +30,14 @@ def generate_hello_world(language):
         file["filename"] = "main.cpp"
         file["content"] = content
 
+    elif language == "c":
+        content = """#include <stdio.h>
+        int main() {
+            printf("Hello World!");
+            return 0;
+        }
+        """
+        file["filename"] = "main.c"
+        file["content"] = content
+
     return file

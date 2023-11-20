@@ -12,6 +12,7 @@ from core.models import (
 )
 from api.serializers.cpod import CpodSerializer, FileCodeSerializer
 from api.utils import generate_hello_world
+from jobs.jobs import JobDispatcher, PythonJob, NodeJob, CJob, CPPJob
 
 
 class CpodViewSet(viewsets.ModelViewSet):
@@ -19,6 +20,7 @@ class CpodViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = CpodSerializer
+    job_dispatcher = JobDispatcher()
 
     def get_queryset(self):
         current_user = self.request.user
@@ -42,7 +44,6 @@ class CpodViewSet(viewsets.ModelViewSet):
             },
         )
         language = instance.language
-        print(language)
         file = generate_hello_world(language)
         user = User.objects.get(username=self.request.user.username)
         FileCode.objects.create(
@@ -67,6 +68,32 @@ class CpodViewSet(viewsets.ModelViewSet):
             },
         )
         return Response(status=status.HTTP_200_OK)
+
+    @action(methods=["POST"], detail=True)
+    def run(self, request, pk=None):
+        cpod = self.get_object()
+        cpod_name = cpod.cid
+        user = self.request.user
+        filename = request.data["filename"]
+        content = request.data["content"]
+
+        if cpod.language == "python":
+            job = PythonJob(user.username, cpod_name, filename, content)
+        elif cpod.language == "javascript":
+            job = NodeJob(user.username, cpod_name, filename, content)
+        elif cpod.language == "c":
+            job = CJob(user.username, cpod_name, filename, content)
+        elif cpod.language == "cpp":
+            job = CPPJob(user.username, cpod_name, filename, content)
+        else:
+            job = PythonJob(user.username, cpod_name, filename, content)
+        resp = self.job_dispatcher.dispatch("podchy-codex", job)
+        return Response(
+            status=status.HTTP_200_OK,
+            data={
+                "result": resp,
+            },
+        )
 
     @action(methods=["GET"], detail=True)
     def files(self, request, pk=None):

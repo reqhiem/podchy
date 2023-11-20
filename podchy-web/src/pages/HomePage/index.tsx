@@ -19,11 +19,13 @@ import {
     BiLogoJavascript,
     BiLogoPython,
 } from 'react-icons/bi';
+import { TbBrandCpp } from 'react-icons/tb';
 import { useEffect, useMemo, useState } from 'react';
 import Spinner from '@components/Spinner';
 import './styles.css';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import podchyClient from '@services/podchyCient';
 
 enum Permission {
     OWNER = 'OWNER',
@@ -52,9 +54,20 @@ type NewCpodForm = {
     language: string;
 };
 
+type InviteToCpod = {
+    username: string;
+};
+
+type CpodToShare = {
+    cid: string;
+    name: string;
+};
+
 export default function HomePage() {
     const [loaded, setLoaded] = useState(false);
     const [openModal, setOpenModal] = useState(false);
+    const [openShareModal, setOpenShareModal] = useState(false);
+    const [cpodToShare, setCpodToShare] = useState<CpodToShare>();
     const [cpods, setCpods] = useState<Cpod[]>([]);
     const authContextValues = useMemo(
         () => ({
@@ -100,10 +113,12 @@ export default function HomePage() {
             key: '2',
             label: (
                 <>
-                    <div className="flex flex-row gap-3">
-                        <LogoutOutlined />
-                        Logout
-                    </div>
+                    <Link to="/logout">
+                        <div className="flex flex-row gap-3">
+                            <LogoutOutlined />
+                            Logout
+                        </div>
+                    </Link>
                 </>
             ),
         },
@@ -172,9 +187,13 @@ export default function HomePage() {
             });
     };
 
-    const handleOnClickOption = (option: string, cid: string) => {
+    const handleOnClickOption = (option: string, cid: string, name: string) => {
         if (option === 'delete') {
             handleDeleteCpod(cid);
+        }
+        if (option === 'share') {
+            setCpodToShare({ cid, name });
+            setOpenShareModal(true);
         }
     };
 
@@ -199,11 +218,73 @@ export default function HomePage() {
             });
     };
 
+    const handleInviteToCpod = (values: InviteToCpod) => {
+        console.log(values);
+        podchyClient
+            .post(`/cpod/${cpodToShare?.cid}/invite`, values)
+            .then((res) => {
+                if (res.status === 200) {
+                    notification.success({
+                        message: 'Invitation sended',
+                        description: `${values.username} was invited to the cpod.`,
+                    });
+                }
+                setOpenShareModal(false);
+            })
+            .catch((err) => {
+                notification.error({
+                    message: 'Some error',
+                    description: "Invitation couldn't send to the user",
+                });
+                console.error(err);
+            });
+    };
+
     return (
         <Flex vertical>
             <header className="flex justify-between items-center border-0 border-b-2 border-solid border-gray-300 px-4 py-1">
                 <p className="font-bold text-xl m-0 text-lavender">Podchy.</p>
                 <div className="flex items-center gap-2">
+                    <Modal
+                        open={openShareModal}
+                        width={360}
+                        footer={null}
+                        onCancel={() => {
+                            setOpenShareModal(false);
+                        }}
+                    >
+                        <Form layout="vertical" onFinish={handleInviteToCpod}>
+                            <p className="text-xl m-0 font-semibold mb-3">
+                                Invite to cpod {cpodToShare?.name}
+                            </p>
+                            <Form.Item
+                                name="username"
+                                label="Username"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:
+                                            'Please fill the username to share the cpod.',
+                                    },
+                                ]}
+                            >
+                                <Input placeholder="username" />
+                            </Form.Item>
+                            <div className="flex gap-2">
+                                <Button
+                                    block
+                                    onClick={() => {
+                                        setOpenShareModal(false);
+                                    }}
+                                >
+                                    Cancelar
+                                </Button>
+                                <Button block type="primary" htmlType="submit">
+                                    Invite
+                                </Button>
+                            </div>
+                        </Form>
+                    </Modal>
                     <Modal
                         width={360}
                         open={openModal}
@@ -257,6 +338,23 @@ export default function HomePage() {
                                                 </div>
                                             ),
                                             value: 'javascript',
+                                        },
+                                        {
+                                            label: (
+                                                <div className="flex gap-2 items-center">
+                                                    <TbBrandCpp />
+                                                    C++
+                                                </div>
+                                            ),
+                                            value: 'cpp',
+                                        },
+                                        {
+                                            label: (
+                                                <div className="flex gap-2 items-center">
+                                                    <BiLogoJavascript />C
+                                                </div>
+                                            ),
+                                            value: 'c',
                                         },
                                     ]}
                                 />
@@ -320,6 +418,7 @@ export default function HomePage() {
                                                                 handleOnClickOption(
                                                                     key,
                                                                     item.cid,
+                                                                    item.name,
                                                                 );
                                                             },
                                                         }}
