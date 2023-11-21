@@ -75,6 +75,8 @@ This will install backend and frontend requirements, if you have some issues, ma
 
 1. Run `make stop` to stop the database service and minikube.
 
+## Tech stack
+
 ### Backend
 
 - Django Rest Framework
@@ -99,3 +101,11 @@ This will install backend and frontend requirements, if you have some issues, ma
 ##  Acknowledgements
 
 Thanks to contribuitors.
+
+1. Joel Perca
+
+2. Misael Vilchez
+
+3. Kate Olazabal
+
+4. Edgar Espinoza
