@@ -21,18 +21,22 @@ run-api:
 	@ip_address=$$(python -c 'import socket; s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(("8.8.8.8", 80)); print(s.getsockname()[0])'); \
     cd $(API_DIR) && python manage.py runserver $$ip_address:8080
 
+.phony: run-web
+run-web:
+	- cd $(WEB_DIR) && npm run dev
+
 .phony: makemigrations
 makemigrations:
-	- python manage.py makemigrations
+	- cd $(API_DIR) python manage.py makemigrations
 
 .phony: migrate
 migrate:
-	- python manage.py migrate
+	- cd $(API_DIR) && python manage.py migrate
 
 .phony: createsuperuser
 createsuperuser:
-	- python manage.py createsuperuser
+	- cd $(API_DIR) python manage.py createsuperuser
 
 .phony: shell
 shell:
-	- python manage.py shell
+	- cd $(API_DIR) python manage.py shell
