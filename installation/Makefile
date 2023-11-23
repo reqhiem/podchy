@@ -2,8 +2,8 @@ include ../podchy-api/.env
 
 WEB_DIR = ../podchy-web
 API_DIR = ../podchy-api
-# ARTIFACT_REGISTRY_REPOSITORY = us-central1-docker.pkg.dev/podchy-project/podchy
-ARTIFACT_REGISTRY_REPOSITORY = reqhiem
+ARTIFACT_REGISTRY_REPOSITORY = us-central1-docker.pkg.dev/podchy-project/podchy
+DH_REGISTRY_REPOSITORY = reqhiem
 IP_ADDRESS = $$(python -c 'import socket; s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(("8.8.8.8", 80)); print(s.getsockname()[0])')
 
 .phony: install
@@ -16,10 +16,13 @@ start:
 	- minikube start
 	- docker compose -f docker-compose.yml up -d
 
-.phony: build-images
-build-images:
-	- cd $(API_DIR) && docker build . -t $(ARTIFACT_REGISTRY_REPOSITORY)/podchy-api:latest
+.phony: build-api
+build-api:
+	- cd $(API_DIR) && docker build . -t $(DH_REGISTRY_REPOSITORY)/podchy-api:latest
 	
+.phony: upload-api
+upload-api:
+	- docker push $(DH_REGISTRY_REPOSITORY)/podchy-api:latest
 	
 .phony: build-web
 build-web:
@@ -29,24 +32,45 @@ build-web:
 upload-web:
 	- docker push $(ARTIFACT_REGISTRY_REPOSITORY)/podchy-web:latest
 
-.phony: upload-images
-upload-images:
-	- docker push $(ARTIFACT_REGISTRY_REPOSITORY)/podchy-api:latest
-
 .phony: secrets
 secrets:
 	- kubectl create secret generic podchy-api-secret --from-env-file=$(API_DIR)/.env
 
-.phony: images
-images: build-images upload-images
+.phony: delete-secrets
+delete-secrets:
+	- kubectl delete secret podchy-api-secret
+
+.phony: update-ip
+update-api:
+	
+
+.phony: images-api
+images-api: build-api upload-api
+
+.phony: images-web
+images-web: build-web upload-web
+
+.phony: deploy-api
+deploy-api:
+	- kubectl apply -f k8s/api-deploy.yml
+
+.phony: deploy-web
+deploy-web:
+	- kubectl apply -f k8s/web-deploy.yml
 
 .phony: deploy
-deploy:
-	- kubectl apply -f k8s/podchy-api-service.yml
+deploy: deploy-api deploy-web
+
+.phony: uninstall-api
+uninstall-api:
+	- kubectl delete -f k8s/api-deploy.yml
+
+.phony: uninstall-web
+uninstall-web:
+	- kubectl delete -f k8s/web-deploy.yml
 
 .phony: uninstall
-uninstall:
-	- kubectl delete -f k8s/podchy-api-service.yml
+uninstall: uninstall-api uninstall-web
 
 .phony: stop
 stop:
