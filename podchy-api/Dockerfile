@@ -3,10 +3,9 @@ FROM python:3.9.18-slim
 COPY . /app
 WORKDIR /app
 
-RUN python3 -m venv /opt/venv
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-RUN pip install pip --upgrade
-RUN /opt/venv/bin/pip install -r requirements/requirements.txt
-RUN chmod +x entrypoint.sh
+RUN pip install -r requirements/requirements.txt
 
-CMD ["/app/entrypoint.sh"]
+EXPOSE 8000

@@ -5,6 +5,7 @@ from kubernetes.client import Configuration
 from kubernetes.client.api import core_v1_api
 from kubernetes.client.rest import ApiException
 from kubernetes.stream import stream
+from django.conf import settings
 
 
 class Job:
@@ -79,7 +80,8 @@ class CPPJob(Job):
 
 class JobDispatcher:
     def __init__(self) -> None:
-        config.load_kube_config()
+        # config.load_kube_config()
+        config.load_incluster_config()
         try:
             c = Configuration().get_default_copy()
         except AttributeError:
