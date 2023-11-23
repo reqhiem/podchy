@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from .utils import get_host_ip
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -20,13 +22,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-dgz15)lx32ult8t&agxt=7@_&$ywv3ku)kewx*6k5p_56@t6ki"
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "Mx-aEx4cUwCx-VD1KUJPdIgkECmvbS0lh-grstiBqeo",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG", True)
 
-ALLOWED_HOSTS = ["localhost", "192.168.0.3"]
+ALLOWED_HOSTS = [
+    x
+    for x in os.environ.get(
+        "DJANGO_ALLOWED_HOSTS",
+        "",  # Default ALLOWED_HOSTS
+    ).split(",")
+    if x
+]
 
+if DEBUG:
+    ALLOWED_HOSTS.append(get_host_ip())
 
 # Application definition
 
@@ -99,19 +113,23 @@ CHANNEL_LAYERS = {
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "podchy_db",
-        "USER": "podchy",
-        "PASSWORD": "podchy",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "HOST": os.environ.get("DB_HOST", "localhost"),
+        "PORT": os.environ.get("DB_PORT", "5432"),
+        "NAME": os.environ.get("DB_NAME", "podchy_db"),
+        "USER": os.environ.get("DB_USER", "podchy"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", "podchy"),
     }
 }
 
 
 # REST Framework cors headers
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3002",
-    "http://192.168.0.8:3002",
+    x
+    for x in os.environ.get(
+        "DJANGO_CORS_ALLOWED_ORIGINS",
+        "",
+    ).split(",")
+    if x
 ]
 
 # Password validation

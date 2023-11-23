@@ -1,6 +1,8 @@
 Django
 djangorestframework
-django-filters
 psycopg2-binary
 django-cors-headers
 kubernetes
+gunicorn
+uvicorn
+channels[daphne]
