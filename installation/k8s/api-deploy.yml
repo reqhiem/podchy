@@ -39,7 +39,6 @@ metadata:
   labels:
     app: podchy-api-deployment
 spec:
-  type: LoadBalancer
   selector:
     app: podchy-api-deployment
   ports:

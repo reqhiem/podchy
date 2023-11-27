@@ -40,10 +40,6 @@ secrets:
 delete-secrets:
 	- kubectl delete secret podchy-api-secret
 
-.phony: update-ip
-update-api:
-	
-
 .phony: images-api
 images-api: build-api upload-api
 
