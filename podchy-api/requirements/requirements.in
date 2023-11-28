@@ -1,8 +1,8 @@
-Django
+Django==4
 djangorestframework
 psycopg2-binary
 django-cors-headers
 kubernetes
 gunicorn
-uvicorn
-channels[daphne]
+uvicorn[standard]
+channels

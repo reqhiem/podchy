@@ -4,7 +4,7 @@ services:
   db:
     image: postgres:14.1-alpine
     container_name: podchy_db
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_DB: podchy_db
       POSTGRES_USER: podchy
@@ -13,7 +13,6 @@ services:
       - 5432:5432
     volumes:
       - db:/var/lib/postgresql/data
-
 volumes:
   db:
     driver: local

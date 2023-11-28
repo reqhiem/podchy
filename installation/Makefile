@@ -2,8 +2,7 @@ include ../podchy-api/.env
 
 WEB_DIR = ../podchy-web
 API_DIR = ../podchy-api
-ARTIFACT_REGISTRY_REPOSITORY = us-central1-docker.pkg.dev/podchy-project/podchy
-DH_REGISTRY_REPOSITORY = reqhiem
+LOCAL_REGISTRY = localhost:5000
 IP_ADDRESS = $$(python -c 'import socket; s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(("8.8.8.8", 80)); print(s.getsockname()[0])')
 
 .phony: install
@@ -11,26 +10,34 @@ install:
 	- cd $(API_DIR) && pip install -r requirements/requirements.txt
 	- cd $(WEB_DIR) && npm install
 
+.phony: resources
+resources:
+	- docker compose -f docker-compose.yml up -d
+	- minikube start
+	- minikube addons enable ingress
+	- minikube addons enable registry
+	- minikube addons enable metrics-server
+
 .phony: start
 start:
-	- minikube start
 	- docker compose -f docker-compose.yml up -d
+	- minikube start
 
 .phony: build-api
 build-api:
-	- cd $(API_DIR) && docker build . -t $(DH_REGISTRY_REPOSITORY)/podchy-api:latest
+	- cd $(API_DIR) && docker build . -t $(LOCAL_REGISTRY)/podchy-api:latest
 	
 .phony: upload-api
 upload-api:
-	- docker push $(DH_REGISTRY_REPOSITORY)/podchy-api:latest
+	- docker push $(LOCAL_REGISTRY)/podchy-api:latest
 	
 .phony: build-web
 build-web:
-	- cd $(WEB_DIR) && docker build . -t $(ARTIFACT_REGISTRY_REPOSITORY)/podchy-web:latest
+	- cd $(WEB_DIR) && docker build . -t $(LOCAL_REGISTRY)/podchy-web:latest
 
 .phony: upload-web
 upload-web:
-	- docker push $(ARTIFACT_REGISTRY_REPOSITORY)/podchy-web:latest
+	- docker push $(LOCAL_REGISTRY)/podchy-web:latest
 
 .phony: secrets
 secrets:
@@ -75,8 +82,7 @@ stop:
 
 .phony: run-api
 run-api:
-	@ip_address=$$(python -c 'import socket; s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(("8.8.8.8", 80)); print(s.getsockname()[0])'); \
-    cd $(API_DIR) && python manage.py runserver $$ip_address:8000
+	- cd $(API_DIR) && uvicorn config.asgi:application --host 0.0.0.0 --port 8000
 
 .phony: run-web
 run-web:

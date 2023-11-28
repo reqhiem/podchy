@@ -4,6 +4,8 @@
 #
 #    pip-compile requirements.in
 #
+anyio==4.1.0
+    # via watchfiles
 asgiref==3.7.2
     # via
     #   channels
@@ -27,7 +29,7 @@ certifi==2023.11.17
     #   requests
 cffi==1.16.0
     # via cryptography
-channels[daphne]==4.0.0
+channels==3.0.0
     # via -r requirements.in
 charset-normalizer==3.3.2
     # via requests
@@ -40,9 +42,9 @@ cryptography==41.0.5
     #   autobahn
     #   pyopenssl
     #   service-identity
-daphne==4.0.0
+daphne==3.0.2
     # via channels
-django==4.2.7
+django==4.0
     # via
     #   -r requirements.in
     #   channels
@@ -52,11 +54,15 @@ django-cors-headers==4.3.1
     # via -r requirements.in
 djangorestframework==3.14.0
     # via -r requirements.in
+exceptiongroup==1.2.0
+    # via anyio
 google-auth==2.23.4
     # via kubernetes
 gunicorn==21.2.0
     # via -r requirements.in
 h11==0.14.0
+    # via uvicorn
+httptools==0.6.1
     # via uvicorn
 hyperlink==21.0.0
     # via
@@ -64,6 +70,7 @@ hyperlink==21.0.0
     #   twisted
 idna==3.4
     # via
+    #   anyio
     #   hyperlink
     #   requests
     #   twisted
@@ -94,10 +101,14 @@ pyopenssl==23.3.0
     # via twisted
 python-dateutil==2.8.2
     # via kubernetes
+python-dotenv==1.0.0
+    # via uvicorn
 pytz==2023.3.post1
     # via djangorestframework
 pyyaml==6.0.1
-    # via kubernetes
+    # via
+    #   kubernetes
+    #   uvicorn
 requests==2.31.0
     # via
     #   kubernetes
@@ -113,6 +124,8 @@ six==1.16.0
     #   automat
     #   kubernetes
     #   python-dateutil
+sniffio==1.3.0
+    # via anyio
 sqlparse==0.4.4
     # via django
 twisted[tls]==23.10.0
@@ -130,10 +143,16 @@ urllib3==1.26.18
     # via
     #   kubernetes
     #   requests
-uvicorn==0.24.0.post1
+uvicorn[standard]==0.24.0.post1
     # via -r requirements.in
+uvloop==0.19.0
+    # via uvicorn
+watchfiles==0.21.0
+    # via uvicorn
 websocket-client==1.6.4
     # via kubernetes
+websockets==12.0
+    # via uvicorn
 zope-interface==6.1
     # via twisted
 
