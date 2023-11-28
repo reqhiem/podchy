@@ -34,7 +34,7 @@ ALLOWED_HOSTS = [
     x
     for x in os.environ.get(
         "DJANGO_ALLOWED_HOSTS",
-        "",  # Default ALLOWED_HOSTS
+        "0.0.0.0",  # Default ALLOWED_HOSTS
     ).split(",")
     if x
 ]
@@ -45,7 +45,6 @@ if DEBUG:
 # Application definition
 
 DEFAULT_APPS = [
-    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -65,7 +64,7 @@ PROJECT_APPS = [
     "api",
 ]
 
-INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + PROJECT_APPS
+INSTALLED_APPS = PROJECT_APPS + THIRD_PARTY_APPS + DEFAULT_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -98,14 +97,6 @@ TEMPLATES = [
 
 # WSGI_APPLICATION = "config.wsgi.application"
 
-# For channel support
-ASGI_APPLICATION = "config.asgi.application"
-
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-    }
-}
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -118,16 +109,27 @@ DATABASES = {
         "NAME": os.environ.get("DB_NAME", "podchy_db"),
         "USER": os.environ.get("DB_USER", "podchy"),
         "PASSWORD": os.environ.get("DB_PASSWORD", "podchy"),
+        "OPTIONS": {
+            "connect_timeout": 20,
+        },
     }
 }
 
+# For channel support
+ASGI_APPLICATION = "config.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}
 
 # REST Framework cors headers
 CORS_ALLOWED_ORIGINS = [
     x
     for x in os.environ.get(
         "DJANGO_CORS_ALLOWED_ORIGINS",
-        "",
+        "http://localhost:3002",
     ).split(",")
     if x
 ]

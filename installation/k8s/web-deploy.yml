@@ -6,34 +6,15 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: podchy-web-deployment
+      app: podchy-web
   template:
     metadata:
       labels:
-        app: podchy-web-deployment
+        app: podchy-web
     spec:
       containers:
         - name: podchy-web
-          image: reqhiem/podchy-web:latest
+          image: localhost:5000/podchy-web:latest
           command: ["nginx", "-g", "daemon off;"]
           ports:
             - containerPort: 80
-          envFrom:
-            - secretRef:
-                name: podchy-api-secret
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: default
-  name: django-web-service
-  labels:
-    app: podchy-web-deployment
-spec:
-  type: LoadBalancer
-  selector:
-    app: podchy-web-deployment
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80

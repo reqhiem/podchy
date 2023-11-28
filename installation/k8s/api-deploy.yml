@@ -1,10 +1,3 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: podchy-api
-  namespace: default
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -22,27 +15,10 @@ spec:
       serviceAccountName: podchy-api
       containers:
         - name: podchy-api
-          image: reqhiem/podchy-api:latest
-          command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+          image: localhost:5000/podchy-api:latest
+          command: ["uvicorn", "config.asgi:application", "--host", "0.0.0.0", "--port", "8000"]
           ports:
             - containerPort: 8000
           envFrom:
             - secretRef:
                 name: podchy-api-secret
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: default
-  name: django-api-service
-  labels:
-    app: podchy-api-deployment
-spec:
-  type: LoadBalancer
-  selector:
-    app: podchy-api-deployment
-  ports:
-    - protocol: TCP
-      port: 5000
-      targetPort: 8000

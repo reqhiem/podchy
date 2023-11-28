@@ -80,8 +80,10 @@ class CPPJob(Job):
 
 class JobDispatcher:
     def __init__(self) -> None:
-        # config.load_kube_config()
-        config.load_incluster_config()
+        if settings.DEBUG:
+            config.load_kube_config()
+        else:
+            config.load_incluster_config()
         try:
             c = Configuration().get_default_copy()
         except AttributeError:
@@ -97,6 +99,7 @@ class JobDispatcher:
             "kind": "Pod",
             "metadata": {"name": pod_name},
             "spec": {
+                "serviceAccountName": "podchy-api",
                 "containers": [
                     {
                         "name": "podchy-codex",
@@ -142,7 +145,7 @@ class JobDispatcher:
         except ApiException as e:
             if e.status != 404:
                 logging.error(f"Unknown error: {e}")
-                exit(1)
+                # exit(1)
 
         if not resp:
             self.__launch_pod(pod_name)

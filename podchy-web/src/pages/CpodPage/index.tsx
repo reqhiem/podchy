@@ -83,59 +83,64 @@ export default function CpodPage() {
         const fetchInitialState = async () => {
             const cpodInfo = await podchyClient.get(`/cpod/${cpod}`);
             setCpodName(cpodInfo.data.name);
-            podchyClient.get(`/cpod/${cpod}/files`).then((res) => {
-                setFiles(res.data);
-                setCurrentFile(res.data[0]);
-            });
+
+            const filesResponse = await podchyClient.get(`/cpod/${cpod}/files`);
+            if (filesResponse.status === 200) {
+                const files = filesResponse.data as IFile[];
+                setFiles(files);
+                setCurrentFile(files[0]);
+            }
+
+            try {
+                socketRef.current = new WebSocket(
+                    `${import.meta.env.VITE_PODCHY_WS_URL}/ws/cpod/${cpod}/`,
+                );
+                socketRef.current.onopen = () => {
+                    console.log('socket opened');
+                    setSocketConnected(true);
+                };
+                socketRef.current.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'UPDATE_FILE') {
+                        // update files
+                        const { fid, content } = data;
+                        setFiles((prevFiles) => {
+                            const newFiles = [...prevFiles];
+                            // update files affected by the change
+                            const fileToUpdate = newFiles.find(
+                                (file) => file.fid === fid,
+                            );
+                            if (fileToUpdate) {
+                                fileToUpdate.content = content;
+                            }
+                            return newFiles;
+                        });
+
+                        // update current file if it was affected by the change
+                        setCurrentFile((prevCurrentFile) => {
+                            const fileToUpdate = prevCurrentFile as IFile;
+                            if (fileToUpdate?.fid === fid) {
+                                fileToUpdate.content = content;
+                            }
+                            return fileToUpdate;
+                        });
+                    }
+                    if (data.type === 'ADD_FILE') {
+                        const newFile = data.file as IFile;
+                        newFile.key = newFile.fid;
+                        setFiles((prevFiles) => [...prevFiles, newFile]);
+                    }
+                };
+                socketRef.current.onclose = () => {
+                    console.log('socket closed');
+                    setSocketConnected(false);
+                };
+            } catch (err) {
+                console.error(err);
+            }
         };
         fetchInitialState();
-        try {
-            socketRef.current = new WebSocket(
-                `${import.meta.env.VITE_PODCHY_WS_URL}/ws/cpod/${cpod}/`,
-            );
-            socketRef.current.onopen = () => {
-                console.log('socket opened');
-                setSocketConnected(true);
-            };
-            socketRef.current.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                if (data.type === 'UPDATE_FILE') {
-                    // update files
-                    const { fid, content } = data;
-                    setFiles((prevFiles) => {
-                        const newFiles = [...prevFiles];
-                        // update files affected by the change
-                        const fileToUpdate = newFiles.find(
-                            (file) => file.fid === fid,
-                        );
-                        if (fileToUpdate) {
-                            fileToUpdate.content = content;
-                        }
-                        return newFiles;
-                    });
-
-                    // update current file if it was affected by the change
-                    setCurrentFile((prevCurrentFile) => {
-                        const fileToUpdate = prevCurrentFile as IFile;
-                        if (fileToUpdate?.fid === fid) {
-                            fileToUpdate.content = content;
-                        }
-                        return fileToUpdate;
-                    });
-                }
-                if (data.type === 'ADD_FILE') {
-                    const newFile = data.file as IFile;
-                    newFile.key = newFile.fid;
-                    setFiles((prevFiles) => [...prevFiles, newFile]);
-                }
-            };
-            socketRef.current.onclose = () => {
-                console.log('socket closed');
-                setSocketConnected(false);
-            };
-        } catch (err) {
-            console.error(err);
-        }
+        
         return () => {
             if (socketRef.current) {
                 socketRef.current.close();
