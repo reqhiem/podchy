@@ -2,7 +2,7 @@ include ../podchy-api/.env
 
 WEB_DIR = ../podchy-web
 API_DIR = ../podchy-api
-LOCAL_REGISTRY = localhost:5000
+LOCAL_REGISTRY = reqhiem
 IP_ADDRESS = $$(python -c 'import socket; s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(("8.8.8.8", 80)); print(s.getsockname()[0])')
 
 .phony: install
@@ -56,10 +56,14 @@ images-web: build-web upload-web
 .phony: deploy-api
 deploy-api:
 	- kubectl apply -f k8s/api-deploy.yml
+	- kubectl apply -f k8s/api-service.yml
+	- kubectl apply -f k8s/api-ingress.yml
 
 .phony: deploy-web
 deploy-web:
 	- kubectl apply -f k8s/web-deploy.yml
+	- kubectl apply -f k8s/web-service.yml
+	- kubectl apply -f k8s/web-ingress.yml
 
 .phony: deploy
 deploy: deploy-api deploy-web
@@ -67,10 +71,14 @@ deploy: deploy-api deploy-web
 .phony: uninstall-api
 uninstall-api:
 	- kubectl delete -f k8s/api-deploy.yml
+	- kubectl delete -f k8s/api-service.yml
+	- kubectl delete -f k8s/api-ingress.yml
 
 .phony: uninstall-web
 uninstall-web:
 	- kubectl delete -f k8s/web-deploy.yml
+	- kubectl delete -f k8s/web-service.yml
+	- kubectl delete -f k8s/web-ingress.yml
 
 .phony: uninstall
 uninstall: uninstall-api uninstall-web

@@ -30,14 +30,16 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 
-ALLOWED_HOSTS = [
+""" ALLOWED_HOSTS = [
     x
     for x in os.environ.get(
         "DJANGO_ALLOWED_HOSTS",
         "0.0.0.0",  # Default ALLOWED_HOSTS
     ).split(",")
     if x
-]
+] """
+
+ALLOWED_HOSTS = ["*"]
 
 if DEBUG:
     ALLOWED_HOSTS.append(get_host_ip())
@@ -125,14 +127,16 @@ CHANNEL_LAYERS = {
 }
 
 # REST Framework cors headers
-CORS_ALLOWED_ORIGINS = [
+""" CORS_ALLOWED_ORIGINS = [
     x
     for x in os.environ.get(
         "DJANGO_CORS_ALLOWED_ORIGINS",
         "http://localhost:3002",
     ).split(",")
     if x
-]
+] """
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

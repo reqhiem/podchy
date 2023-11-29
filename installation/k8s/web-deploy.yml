@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: podchy-web
-          image: localhost:5000/podchy-web:latest
+          image: reqhiem/podchy-web:latest
           command: ["nginx", "-g", "daemon off;"]
           ports:
             - containerPort: 80

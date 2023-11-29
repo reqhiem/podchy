@@ -6,19 +6,48 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: podchy-api-deployment
+      app: podchy-api
   template:
     metadata:
       labels:
-        app: podchy-api-deployment
+        app: podchy-api
     spec:
-      serviceAccountName: podchy-api
       containers:
         - name: podchy-api
-          image: localhost:5000/podchy-api:latest
-          command: ["uvicorn", "config.asgi:application", "--host", "0.0.0.0", "--port", "8000"]
+          image: reqhiem/podchy-api:latest
+          command: ["uvicorn", "config.asgi:application", "--host", "0.0.0.0", "--port", "80"]
           ports:
             - containerPort: 8000
           envFrom:
             - secretRef:
                 name: podchy-api-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: default
+  name: podchy-api-service
+  labels:
+    app: podchy-api
+spec:
+  type: NodePort
+  selector:
+    app: podchy-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ingress
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "api-static-ip"
+spec:
+  defaultBackend:
+    service:
+      name: podchy-api-service
+      port:
+        number: 80
