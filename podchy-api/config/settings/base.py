@@ -41,9 +41,6 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 
 ALLOWED_HOSTS = ["*"]
 
-if DEBUG:
-    ALLOWED_HOSTS.append(get_host_ip())
-
 # Application definition
 
 DEFAULT_APPS = [
@@ -105,15 +102,15 @@ TEMPLATES = [
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": os.environ.get(
+            "DB_ENGINE",
+            "django.db.backends.postgresql_psycopg2",
+        ),
         "HOST": os.environ.get("DB_HOST", "localhost"),
         "PORT": os.environ.get("DB_PORT", "5432"),
         "NAME": os.environ.get("DB_NAME", "podchy_db"),
         "USER": os.environ.get("DB_USER", "podchy"),
         "PASSWORD": os.environ.get("DB_PASSWORD", "podchy"),
-        "OPTIONS": {
-            "connect_timeout": 20,
-        },
     }
 }
 

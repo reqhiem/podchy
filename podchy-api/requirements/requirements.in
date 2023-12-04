@@ -6,3 +6,4 @@ kubernetes
 gunicorn
 uvicorn[standard]
 channels
+django-yugabytedb

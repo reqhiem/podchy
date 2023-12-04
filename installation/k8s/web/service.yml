@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: default
-  name: podchy-web-service
+  name: podchy-web-serv
   labels:
     app: podchy-web
 spec:

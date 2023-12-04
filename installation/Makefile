@@ -53,32 +53,16 @@ images-api: build-api upload-api
 .phony: images-web
 images-web: build-web upload-web
 
-.phony: deploy-api
-deploy-api:
-	- kubectl apply -f k8s/api-deploy.yml
-	- kubectl apply -f k8s/api-service.yml
-	- kubectl apply -f k8s/api-ingress.yml
-
-.phony: deploy-web
-deploy-web:
-	- kubectl apply -f k8s/web-deploy.yml
-	- kubectl apply -f k8s/web-service.yml
-	- kubectl apply -f k8s/web-ingress.yml
-
-.phony: deploy
-deploy: deploy-api deploy-web
-
 .phony: uninstall-api
 uninstall-api:
-	- kubectl delete -f k8s/api-deploy.yml
-	- kubectl delete -f k8s/api-service.yml
-	- kubectl delete -f k8s/api-ingress.yml
+	- kubectl delete -f k8s/api/deploy.yml
+	- kubectl delete -f k8s/api/service.yml
+	- kubectl delete -f k8s/api/serviceaccount.yml
 
 .phony: uninstall-web
 uninstall-web:
-	- kubectl delete -f k8s/web-deploy.yml
-	- kubectl delete -f k8s/web-service.yml
-	- kubectl delete -f k8s/web-ingress.yml
+	- kubectl delete -f k8s/web/deploy.yml
+	- kubectl delete -f k8s/web/service.yml
 
 .phony: uninstall
 uninstall: uninstall-api uninstall-web
