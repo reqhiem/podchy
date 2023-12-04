@@ -30,17 +30,16 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 
-ALLOWED_HOSTS = [
+""" ALLOWED_HOSTS = [
     x
     for x in os.environ.get(
         "DJANGO_ALLOWED_HOSTS",
         "0.0.0.0",  # Default ALLOWED_HOSTS
     ).split(",")
     if x
-]
+] """
 
-if DEBUG:
-    ALLOWED_HOSTS.append(get_host_ip())
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -103,15 +102,15 @@ TEMPLATES = [
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": os.environ.get(
+            "DB_ENGINE",
+            "django.db.backends.postgresql_psycopg2",
+        ),
         "HOST": os.environ.get("DB_HOST", "localhost"),
         "PORT": os.environ.get("DB_PORT", "5432"),
         "NAME": os.environ.get("DB_NAME", "podchy_db"),
         "USER": os.environ.get("DB_USER", "podchy"),
         "PASSWORD": os.environ.get("DB_PASSWORD", "podchy"),
-        "OPTIONS": {
-            "connect_timeout": 20,
-        },
     }
 }
 
@@ -125,14 +124,16 @@ CHANNEL_LAYERS = {
 }
 
 # REST Framework cors headers
-CORS_ALLOWED_ORIGINS = [
+""" CORS_ALLOWED_ORIGINS = [
     x
     for x in os.environ.get(
         "DJANGO_CORS_ALLOWED_ORIGINS",
         "http://localhost:3002",
     ).split(",")
     if x
-]
+] """
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

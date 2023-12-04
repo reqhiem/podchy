@@ -1,12 +1,13 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: podchy-ingress
+  name: api-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$1
+    kubernetes.io/ingress.global-static-ip-name: "api-static-ip"
 spec:
   defaultBackend:
     service:
-      name: podchy-web-service
+      name: podchy-api-service
       port:
         number: 80

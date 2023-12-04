@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: podchy-codex
+spec:
+  serviceAccountName: podchy-api
+  containers:
+    - name: podchy-codex
+      image: reqhiem/podchy-codex
+      args:
+        - "/bin/sh"
+        - "-c"
+        - "while true; do date; sleep 5; done"
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - containerPort: 5000

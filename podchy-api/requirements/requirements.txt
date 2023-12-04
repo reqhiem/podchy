@@ -52,6 +52,8 @@ django==4.0
     #   djangorestframework
 django-cors-headers==4.3.1
     # via -r requirements.in
+django-yugabytedb==4.0.0.post1
+    # via -r requirements.in
 djangorestframework==3.14.0
     # via -r requirements.in
 exceptiongroup==1.2.0
